@@ -45,3 +45,5 @@ spec:
                 path: db-password
               - key: JWT_SECRET
                 path: jwt-secret
+              - key: ADMIN_PASSWORD
+                path: admin-password
