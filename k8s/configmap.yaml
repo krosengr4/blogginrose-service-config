@@ -16,3 +16,4 @@ data:
   PORT: "${PORT}"
   ALLOWED_ORIGINS: "https://blogginrose.com"
   ADMIN_USERNAME: "${ADMIN_USERNAME}"
+  ADMIN_PASSWORD_FILE: "/secrets/admin-password"
