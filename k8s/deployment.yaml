@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blogginrose-service
+  labels:
+    app: blogginrose-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: blogginrose-service
+  template:
+    metadata:
+      labels:
+        app: blogginrose-service
+    spec:
+      containers:
+        - name: blogginrose-service
+          image: ${DOCKER_IMAGE}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: blogginrose-service-config
+            - secretRef:
+                name: blogginrose-service-secrets
+          volumeMounts:
+            - name: secrets
+              mountPath: /secrets
+              readOnly: true
+          resources:
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+      volumes:
+        - name: secrets
+          secret:
+            secretName: blogginrose-service-secrets
+            items:
+              - key: DB_PASSWORD
+                path: db-password
+              - key: JWT_SECRET
+                path: jwt-secret
