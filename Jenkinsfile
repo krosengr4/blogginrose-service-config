@@ -15,23 +15,24 @@ pipeline {
                       keyFileVariable: 'SSH_KEY'
                   )]) {
                       sh '''
-                          scp -i $SSH_KEY -o StrictHostKeyChecking=no -r k8s ${PI_USER}@${PI_HOST}:~/blogginrose-service-k8s
-                          scp -i $SSH_KEY -o StrictHostKeyChecking=no .env ${PI_USER}@${PI_HOST}:~/blogginrose-service-k8s/
+                        ssh -i $SSH_KEY -o StrictHostKeyChecking=no ${PI_USER}@${PI_HOST} 'mkdir -p ~/blogginrose-service-k8s/k8s'
+                        scp -i $SSH_KEY -o StrictHostKeyChecking=no -r k8s ${PI_USER}@${PI_HOST}:~/blogginrose-service-k8s/k8s
+                        scp -i $SSH_KEY -o StrictHostKeyChecking=no .env ${PI_USER}@${PI_HOST}:~/blogginrose-service-k8s/
 
-                          ssh -i $SSH_KEY -o StrictHostKeyChecking=no ${PI_USER}@${PI_HOST} '
-                              cd ~/blogginrose-service-k8s
-                              export KUBECONFIG=~/.kube/config
-                              export $(cat .env | xargs)
+                        ssh -i $SSH_KEY -o StrictHostKeyChecking=no ${PI_USER}@${PI_HOST} '
+                            cd ~/blogginrose-service-k8s
+                            export KUBECONFIG=~/.kube/config
+                            export $(cat .env | xargs)
 
-                              for file in k8s/*.yaml; do
-                                  envsubst < "$file" | kubectl apply -f -
-                              done
+                            for file in k8s/*.yaml; do
+                                envsubst < "$file" | kubectl apply -f -
+                            done
 
-                              kubectl rollout restart deployment/blogginrose-service
-                              kubectl rollout status deployment/blogginrose-service --timeout=60s
-                              kubectl get pods -l app=blogginrose-service
-                          '
-                      '''
+                            kubectl rollout restart deployment/blogginrose-service
+                            kubectl rollout status deployment/blogginrose-service --timeout=60s
+                            kubectl get pods -l app=blogginrose-service
+                        '
+                    '''
                   }
               }
           }
